@@ -30,7 +30,7 @@ lamac -b Sort.lama
 time ./LamaVM Sort.bc
 ```
 
-Performance comparison:
+## Performance comparison
 
 * 0.56s - Compiled
 * 1.3s - Interpreter + (`profile-generate`/`profile-use`)
