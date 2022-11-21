@@ -7,6 +7,9 @@ Implemented by Roman Venediktov
 ## Build instructions
 
 ```bash
+cd runtime 
+make
+cd ..
 cmake .
 make # Or any other generator
 ```
