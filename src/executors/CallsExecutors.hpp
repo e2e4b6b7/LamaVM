@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../globals.hpp"
-#include "../state/InterpreterState.hpp"
-#include "../decoders/SingleInstructionDecoders.hpp"
+#include "globals.hpp"
+#include "state/InterpreterState.hpp"
+#include "decoders/SingleInstructionDecoders.hpp"
 
 void exec_call(InterpreterState &state) {
     auto instruction = state.decoder.consume_as<SimpleInstruction<2>>();
@@ -23,7 +23,7 @@ void exec_begin(InterpreterState &state) {
 }
 
 void exec_end(InterpreterState &state) {
-    auto instruction = state.decoder.consume_as<NoArgumentInstruction>();
+    state.decoder.consume_as<NoArgumentInstruction>();
     auto rv = state.frame_stack.op_top();
     auto ip = state.frame_stack.frame_pop();
     if (ip == nullptr) on_finish();

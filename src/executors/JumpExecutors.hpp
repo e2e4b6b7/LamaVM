@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../state/InterpreterState.hpp"
-#include "../decoders/SingleInstructionDecoders.hpp"
+#include "state/InterpreterState.hpp"
+#include "decoders/SingleInstructionDecoders.hpp"
 
 void exec_jmp(InterpreterState &state) {
     auto instruction = state.decoder.consume_as<SimpleInstruction<1>>();

@@ -1,20 +1,15 @@
 /* Lama SM Bytecode interpreter */
 
 #include "decoders/InstructionsDecoder.hpp"
-#include "ByteFile.hpp"
-#include "state/InterpreterState.hpp"
-#include "executors/BinopExecutor.hpp"
-#include "executors/BuiltinCallsExecutors.hpp"
 #include "executors/Executors.hpp"
-#include "executors/CallsExecutors.hpp"
-#include "executors/JumpExecutors.hpp"
+#include "state/InterpreterState.hpp"
+#include "ByteFile.hpp"
 
 [[noreturn]] void interpret(ByteFile &bf) {
     auto state = InterpreterState{bf};
     state.frame_stack.frame_push(nullptr, 2);
 #define CMD(NAME, PREFIX) \
             case NAME:    \
-                /*printf(#NAME);printf("\n");*/ \
                 exec_##PREFIX(state); \
                 break;
     while (true) {
@@ -57,6 +52,7 @@
 
         }
     }
+#undef CMD
 }
 
 int main(int argc, char *argv[]) {
@@ -64,9 +60,3 @@ int main(int argc, char *argv[]) {
     auto f = ByteFile::read_file(argv[1]);
     interpret(*f);
 }
-
-//todo: word typeallias
-//todo: reduce reinterpret casts
-//todo: profile
-//todo: split executors on files
-//todo: single executors file

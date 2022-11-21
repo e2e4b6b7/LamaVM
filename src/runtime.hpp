@@ -1,26 +1,28 @@
 #pragma once
 
+#include "globals.hpp"
+
 extern "C" {
 
 [[noreturn]] void failure(const char *s, ...);
 
-int Lread();
+word Lread();
 
-int Lwrite(int n);
+word Lwrite(word n);
 
-int Llength(void *p);
+word Llength(word p);
 
-void *Lstring(void *p);
+word Lstring(word p);
 
-void *Barray(int bn, ...);
+word Barray(word bn, ...);
 
-void *Bsexp(int bn, ...);
+word Bsexp(word bn, ...);
 
-int Barray_patt(void *d, int n);
+word Barray_patt(word d, word n);
 
-void *Belem(void *p, int i);
+word Belem(word p, word i);
 
-int Btag(void *d, int t, int n);
+word Btag(word d, word t, word n);
 
 }
 
@@ -40,4 +42,3 @@ auto call_variadic(auto f, int variadic_argc, auto *variadic_argv, auto... args)
             failure("Failed to call variadic function");
     }
 }
-

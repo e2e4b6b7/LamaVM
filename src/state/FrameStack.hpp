@@ -2,46 +2,35 @@
 
 #include <cstddef>
 #include <cassert>
+#include <algorithm>
+
+#include "globals.hpp"
+#include "executors/Boxing.hpp"
 
 [[maybe_unused]] extern void *__gc_stack_top;
 [[maybe_unused]] extern void *__gc_stack_bottom;
 
-/// todo: check indices
-/// todo: optimize fp sp
-/// todo: check fp sp requirements
-/// todo: int * will fix most of casts
-/// todo: meow meow meow meow meow meow meow meow
 template<size_t max_stack>
 class FrameStack {
-    char *data = new char[max_stack];
-    char *fp = nullptr;
-    char *sp = data;
+    word *data = new word[max_stack];
+    word *fp = nullptr;
+    word *sp = reinterpret_cast<word *>(data);
 
 public:
-    int frame_counter = 0;
-    std::vector<int> op_counter;
-    std::vector<int> locals_counter;
-
     FrameStack() {
-        memset(data, 0, max_stack);
         __gc_stack_top = data;
-        __gc_stack_bottom = data + max_stack;
+        __gc_stack_bottom = data;
     }
 
     ~FrameStack() { delete[] data; }
 
     void frame_push(const char *ra, int nargs) {
-//        printf("Push %d\n", ++frame_counter);
-//        op_counter.push_back(0);
-
-        auto prev_sp = sp - nargs * sizeof(int);
-
-        sp += 3 * sizeof(char *);
-        auto ptrs = reinterpret_cast<const char **>(sp - 1);
-        *ptrs = prev_sp;
-        *(ptrs - 1) = fp;
-        *(ptrs - 2) = ra;
-
+        if (nargs > 1) std::reverse(sp - nargs, sp);
+        auto prev_sp = sp - nargs;
+        *sp = reinterpret_cast<word>(prev_sp);
+        *(sp + 1) = reinterpret_cast<word>(fp);
+        *(sp + 2) = reinterpret_cast<word>(ra);
+        __gc_stack_bottom = sp += 3;
         fp = sp;
     }
 
@@ -49,59 +38,47 @@ public:
      * @return previous ip
      */
     const char *frame_pop() {
-//        printf("Pop %d\n", --frame_counter);
-//        assert(op_counter.back() == 1);
-//        op_counter.pop_back();
-//        locals_counter.pop_back();
-
-        auto ptrs = reinterpret_cast<char **>(fp - 1);
-        sp = *ptrs;
-        fp = *(ptrs - 1);
-        return *(ptrs - 2);
+        auto prev_fp = fp;
+        __gc_stack_bottom = sp = reinterpret_cast<word *>(*(prev_fp - 3));
+        fp = reinterpret_cast<word *>(*(prev_fp - 2));
+        return reinterpret_cast<const char *>((*(prev_fp - 1)));
     }
 
-    int &arg(int i) {
-        return *(reinterpret_cast<int *>(fp - 1 - 3 * sizeof(char *)) - i);
+    word &arg(int i) {
+        return *(fp - 4 - i);
     }
 
     void loc_reserve(int nlocs) {
-        assert(sp - fp == 0);
-//        locals_counter.push_back(nlocs);
-        sp += sizeof(int) * nlocs;
+        if constexpr (lama_vm_debug) { assert(sp == fp); }
+        __gc_stack_bottom = sp += nlocs;
     }
 
-    int &loc_get(int i) {
-        return *(reinterpret_cast<int *>(fp - 1) + 1 + i);
+    word &loc_get(int i) {
+        return *(fp + i);
     }
 
-    void op_push(int value) {
-//        assert((sp - fp) / 4 == locals_counter.back() + op_counter.back());
-//        op_counter.back()++;
-        sp += sizeof(int);
-        *(reinterpret_cast<int *>(sp - 1)) = value;
+    void op_push(word value) {
+        *sp = value;
+        __gc_stack_bottom = ++sp;
     }
 
     void op_pop() {
-//        assert((sp - fp) / 4 == locals_counter.back() + op_counter.back());
-//        op_counter.back()--;
-        sp -= sizeof(int);
+        __gc_stack_bottom = --sp;
     }
 
     void op_pop(int n) {
-//        assert((sp - fp) / 4 == locals_counter.back() + op_counter.back());
-//        op_counter.back() -= n;
-        sp -= n * sizeof(int);
+        __gc_stack_bottom = sp -= n;
     }
 
-    int *op_ptr(int n) {
-        return reinterpret_cast<int *>(sp - 1) - n + 1;
+    word *op_ptr(int n) {
+        return sp - n;
     }
 
-    int &op_top() {
-        return *(reinterpret_cast<int *>(sp - 1));
+    word &op_top() {
+        return *(sp - 1);
     }
 
-    int &op_top2() {
-        return *(reinterpret_cast<int *>(sp - 1) - 1);
+    word &op_top2() {
+        return *(sp - 2);
     }
 };
