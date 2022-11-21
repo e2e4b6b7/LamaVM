@@ -34,4 +34,4 @@ Performance comparison:
 
 * 0.56s - Compiled
 * 1.3s - Interpreter + (`profile-generate`/`profile-use`)
-* 2s - Interpreter
+* 1.9s - Interpreter
