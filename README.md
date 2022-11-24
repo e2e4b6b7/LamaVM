@@ -1,6 +1,6 @@
 # LamaVM
 
-VM for Lama language
+VM and analyser for Lama language
 
 Implemented by Roman Venediktov
 
@@ -14,7 +14,7 @@ cmake .
 make # Or any other generator
 ```
 
-## Tests instructions
+## VM tests instructions
 
 Test was copied from original repo. It's bubble sort of 2000 elements. Requires `lamac` to be installed.
 
@@ -27,7 +27,7 @@ time ./Sort
 Run interpreter (requires build):
 ```bash
 lamac -b Sort.lama
-time ./LamaVM Sort.bc
+time ./LamaVM execute Sort.bc
 ```
 
 ## Performance comparison
@@ -35,3 +35,10 @@ time ./LamaVM Sort.bc
 * 0.56s - Compiled
 * 1.3s - Interpreter + (`profile-generate`/`profile-use`)
 * 1.9s - Interpreter
+
+## Analyser tests instructions
+
+```bash
+lamac -b Sort.lama
+time ./LamaVM analyze Sort.bc
+```
