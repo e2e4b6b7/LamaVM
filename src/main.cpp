@@ -1,5 +1,6 @@
 /* Lama SM Bytecode interpreter */
 
+#include "analyzer/analyzer.hpp"
 #include "decoders/InstructionsDecoder.hpp"
 #include "executors/Executors.hpp"
 #include "state/InterpreterState.hpp"
@@ -56,7 +57,12 @@
 }
 
 int main(int argc, char *argv[]) {
-    assert(argc >= 2);
-    auto f = ByteFile::read_file(argv[1]);
-    interpret(*f);
+    assert(argc == 3);
+    if (std::string{argv[1]} == "analyze") {
+        auto f = ByteFile::read_file(argv[2]);
+        analyze(*f);
+    } else if (std::string{argv[1]} == "execute") {
+        auto f = ByteFile::read_file(argv[2]);
+        interpret(*f);
+    }
 }

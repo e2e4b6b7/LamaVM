@@ -16,6 +16,9 @@ private:
 public:
     /** A pointer to the bytecode itself */
     const char *code_ptr;
+
+    /// Next parameters should not be changed as they are fully deserialized as bytes
+
     /** The size (in bytes) of the string table */
     const uint32_t stringtab_size{};
     /** The size (in words) of global area */
